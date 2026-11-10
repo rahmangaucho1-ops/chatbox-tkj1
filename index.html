@@ -1,166 +1,126 @@
-
-<!DOCTYPE html>
+<!doctype html>
 <html lang="id">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Chatbot Pembelajaran TKJ</title>
-
-<style>
-body {
-    font-family: Arial, sans-serif;
-    background: #e8f0f5;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    min-height: 100vh;
-    margin: 0;
-}
-
-.chatbox {
-    width: 350px;
-    background: white;
-    border-radius: 12px;
-    overflow: hidden;
-    box-shadow: 0 4px 15px #999;
-}
-
-.header {
-    background: #087e8b;
-    color: white;
-    padding: 18px;
-    text-align: center;
-    font-weight: bold;
-}
-
-#pesan {
-    height: 350px;
-    padding: 12px;
-    overflow-y: auto;
-}
-
-.chat {
-    padding: 10px;
-    margin: 8px 0;
-    border-radius: 10px;
-    max-width: 80%;
-    overflow-wrap: anywhere;
-}
-
-.user {
-    background: #ccebd5;
-    margin-left: auto;
-    text-align: right;
-}
-
-.bot {
-    background: #eeeeee;
-    margin-right: auto;
-}
-
-.input-area {
-    display: flex;
-    padding: 10px;
-    border-top: 1px solid #ddd;
-}
-
-input {
-    flex: 1;
-    padding: 10px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-}
-
-button {
-    background: #087e8b;
-    color: white;
-    border: none;
-    padding: 10px 15px;
-    margin-left: 5px;
-    border-radius: 6px;
-    cursor: pointer;
-}
-</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#075985">
+  <title>Chatbot AI TKJ | SMK Negeri 1 Percut Sei Tuan</title>
+  <style>
+    :root { --blue:#075985; --blue2:#0e7490; --bg:#eef4f8; --ink:#152536; }
+    * { box-sizing:border-box }
+    body { margin:0; min-height:100vh; display:grid; place-items:center; padding:18px;
+      background:linear-gradient(135deg,#e0f2fe,#f0fdfa); font-family:Arial,sans-serif; color:var(--ink) }
+    .app { width:min(100%,760px); height:min(850px,92vh); min-height:560px; display:flex; flex-direction:column;
+      background:#fff; border-radius:20px; overflow:hidden; box-shadow:0 18px 55px #0f172a22 }
+    header { background:linear-gradient(120deg,var(--blue),var(--blue2)); color:#fff; padding:20px 22px }
+    header h1 { margin:0 0 5px; font-size:clamp(19px,3vw,25px) }
+    header p { margin:0; opacity:.9; font-size:13px }
+    .notice { padding:9px 16px; background:#fefce8; color:#854d0e; font-size:12px; border-bottom:1px solid #fef08a }
+    #messages { flex:1; overflow-y:auto; padding:18px; background:#f8fafc; display:flex; flex-direction:column; gap:12px }
+    .msg { max-width:88%; padding:12px 14px; border-radius:15px; line-height:1.5; white-space:pre-wrap; overflow-wrap:anywhere; font-size:14px }
+    .bot { align-self:flex-start; background:#e2e8f0; border-bottom-left-radius:4px }
+    .user { align-self:flex-end; color:#fff; background:#0e7490; border-bottom-right-radius:4px }
+    .typing { color:#475569; font-style:italic }
+    .composer { display:flex; gap:9px; padding:14px; border-top:1px solid #e2e8f0; background:#fff }
+    textarea { flex:1; resize:none; min-height:46px; max-height:120px; border:1px solid #cbd5e1; border-radius:12px;
+      padding:12px; font:14px Arial; outline:none }
+    textarea:focus { border-color:#0e7490; box-shadow:0 0 0 3px #0e749022 }
+    button { border:0; border-radius:12px; padding:0 19px; background:#075985; color:white; font-weight:bold; cursor:pointer }
+    button:disabled { opacity:.55; cursor:not-allowed }
+    footer { padding:8px 14px 12px; text-align:center; color:#64748b; font-size:11px; background:#fff }
+    .tools { display:flex; justify-content:space-between; align-items:center; gap:10px; padding:8px 14px 0; background:#fff }
+    .tools small { color:#64748b }
+    .clear { background:transparent; color:#0e7490; padding:5px 8px; font-size:12px }
+    @media(max-width:520px) { body{padding:0}.app{height:100vh;min-height:0;border-radius:0}.msg{max-width:94%} }
+  </style>
 </head>
-
 <body>
-
-<div class="chatbox">
-    <div class="header">
-        CHATBOT PEMBELAJARAN TKJ
+  <main class="app">
+    <header>
+      <h1>🤖 Chatbot AI Pembelajaran TKJ</h1>
+      <p>SMK NEGERI 1 PERCUT SEI TUAN · Asisten belajar Teknik Komputer dan Jaringan</p>
+    </header>
+    <div class="notice">Asisten belajar untuk materi komputer, jaringan, IP Address, Mikrotik, Debian, fiber optik, dan keamanan jaringan.</div>
+    <div class="tools">
+      <small id="status">Siap membantu belajar</small>
+      <button class="clear" id="clearBtn" type="button">Hapus percakapan</button>
     </div>
-
-    <div id="pesan">
-        <div class="chat bot">
-            Halo! Selamat datang di Chatbot TKJ.
-            Ada yang ingin kamu pelajari?
-        </div>
-    </div>
-
-    <div class="input-area">
-        <input type="text" id="inputPesan"
-        placeholder="Ketik pesan..."
-        onkeydown="if(event.key==='Enter') kirimPesan()">
-
-        <button onclick="kirimPesan()">Kirim</button>
-    </div>
-</div>
-
+    <section id="messages" aria-live="polite">
+      <div class="msg bot">Halo! Saya Asisten AI TKJ. Silakan tanyakan materi atau masalah praktik jaringan. Contoh: “Jelaskan subnetting dengan contoh sederhana.”</div>
+    </section>
+    <form class="composer" id="chatForm">
+      <textarea id="question" rows="1" maxlength="1500" placeholder="Tulis pertanyaan TKJ..." aria-label="Tulis pertanyaan"></textarea>
+      <button id="sendBtn" type="submit">Kirim</button>
+    </form>
+    <footer>Jawaban AI dapat keliru. Cocokkan konfigurasi dan praktik dengan arahan guru.</footer>
+  </main>
 <script>
-function kirimPesan() {
-    let input = document.getElementById("inputPesan");
-    let pesan = input.value.trim();
+  // GANTI dengan URL Worker Cloudflare setelah Worker berhasil di-deploy.
+  const WORKER_URL = "PASTE_URL_CLOUDFLARE_WORKER_DI_SINI";
 
-    if (pesan === "") return;
+  const form = document.getElementById("chatForm");
+  const input = document.getElementById("question");
+  const messagesEl = document.getElementById("messages");
+  const sendBtn = document.getElementById("sendBtn");
+  const statusEl = document.getElementById("status");
+  const history = [];
 
-    tampilkanPesan(pesan, "user");
+  function addMessage(text, role) {
+    const item = document.createElement("div");
+    item.className = "msg " + (role === "user" ? "user" : "bot");
+    item.textContent = text;
+    messagesEl.appendChild(item);
+    messagesEl.scrollTop = messagesEl.scrollHeight;
+    return item;
+  }
 
-    let pertanyaan = pesan.toLowerCase();
-    let jawaban = "";
+  form.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const text = input.value.trim();
+    if (!text || sendBtn.disabled) return;
 
-    if (pertanyaan.includes("halo")) {
-        jawaban = "Halo juga! Selamat belajar TKJ.";
-    }
-    else if (pertanyaan.includes("komputer")) {
-        jawaban = "Komputer adalah perangkat elektronik untuk mengolah data.";
-    }
-    else if (pertanyaan.includes("ip address")) {
-        jawaban = "IP Address adalah alamat identitas perangkat dalam jaringan.";
-    }
-    else if (pertanyaan.includes("jaringan")) {
-        jawaban = "Jaringan komputer menghubungkan dua perangkat atau lebih.";
-    }
-    else if (pertanyaan.includes("router")) {
-        jawaban = "Router berfungsi menghubungkan jaringan yang berbeda.";
-    }
-    else if (pertanyaan.includes("mikrotik")) {
-        jawaban = "Mikrotik adalah perangkat dan sistem operasi untuk manajemen jaringan.";
-    }
-    else if (pertanyaan.includes("debian")) {
-        jawaban = "Debian adalah sistem operasi Linux yang banyak digunakan sebagai server.";
-    }
-    else {
-        jawaban = "Maaf, saya belum memahami pertanyaan tersebut. Coba tanyakan tentang komputer, IP Address, jaringan, Router, Mikrotik, atau Debian.";
+    if (WORKER_URL.includes("PASTE_URL")) {
+      addMessage("Website belum dihubungkan ke Cloudflare Worker. Ikuti langkah pemasangan pada file PETUNJUK.md.", "bot");
+      return;
     }
 
-    setTimeout(function() {
-        tampilkanPesan(jawaban, "bot");
-    }, 500);
-
+    addMessage(text, "user");
+    history.push({ role: "user", text });
     input.value = "";
-}
+    sendBtn.disabled = true;
+    statusEl.textContent = "AI sedang berpikir...";
+    const typing = addMessage("Sedang menyiapkan jawaban...", "bot");
+    typing.classList.add("typing");
 
-function tampilkanPesan(teks, jenis) {
-    let area = document.getElementById("pesan");
-    let chat = document.createElement("div");
+    try {
+      const response = await fetch(WORKER_URL, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ messages: history.slice(-12) })
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || "Permintaan gagal. Periksa pengaturan Worker/API.");
+      typing.remove();
+      const answer = data.reply || "Maaf, belum ada jawaban. Coba tanyakan dengan kalimat lain.";
+      addMessage(answer, "bot");
+      history.push({ role: "model", text: answer });
+      if (history.length > 12) history.splice(0, history.length - 12);
+      statusEl.textContent = "Terhubung ke AI";
+    } catch (err) {
+      typing.textContent = "Gagal menghubungi AI: " + err.message;
+      statusEl.textContent = "Koneksi bermasalah";
+    } finally {
+      sendBtn.disabled = false;
+      input.focus();
+    }
+  });
 
-    chat.className = "chat " + jenis;
-    chat.textContent = teks;
-
-    area.appendChild(chat);
-    area.scrollTop = area.scrollHeight;
-}
+  document.getElementById("clearBtn").addEventListener("click", () => {
+    history.length = 0;
+    messagesEl.innerHTML = "";
+    addMessage("Percakapan dihapus. Silakan mulai pertanyaan baru!", "bot");
+    statusEl.textContent = "Siap membantu belajar";
+  });
 </script>
-
 </body>
 </html>
